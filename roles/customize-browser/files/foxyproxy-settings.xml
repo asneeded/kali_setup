@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxyproxy>
+<proxies>
+    <proxy name="Burp" id="burp" type="manual" 
+    address="127.0.0.1" port="8080" 
+    include="*://*/*" active="true" 
+    animatedIcons="true" color="#66CC66">
+    </proxy>
+</proxies>
+</foxyproxy>

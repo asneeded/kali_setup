@@ -1,0 +1,54 @@
+---
+- hosts: all
+  become: yes
+
+  tasks:
+    - name: Install Burp Suite
+      apt:
+        name: burpsuite
+        state: latest
+
+    - name: Install Firefox
+      apt:
+        name: firefox
+        state: latest
+
+    - name: Download FoxyProxy Extension
+      get_url:
+        url: "https://addons.mozilla.org/firefox/downloads/file/3802062/foxyproxy_standard-7.5.1-an+fx.xpi"
+        dest: "/tmp/foxyproxy_standard.xpi"
+
+    - name: Install FoxyProxy Extension
+      command: "firefox -install-global-extension /tmp/foxyproxy_standard.xpi"
+
+    - name: Configure Firefox to use FoxyProxy for Burp Suite
+      copy:
+        dest: "/usr/lib/firefox/distribution/policies.json"
+        content: |
+          {
+            "policies": {
+              "Extensions": {
+                "Install": ["file:///tmp/foxyproxy_standard.xpi"],
+                "Locked":  ["foxyproxy@eric.h.jung"]
+              },
+              "Proxy": {
+                "Mode": "none",
+                "Locked": true
+              }
+            }
+          }
+
+    - name: Setup FoxyProxy Configuration
+      copy:
+        dest: "/home/vagrant/.mozilla/firefox/your_profile.default/extensions/foxyproxy-settings.xml"
+        content: |
+          <?xml version="1.0" encoding="UTF-8"?>
+          <foxyproxy>
+            <proxies>
+              <proxy name="Burp" id="burp" type="manual" 
+                address="127.0.0.1" port="8080" 
+                include="*://*/*" active="true" 
+                animatedIcons="true" color="#66CC66">
+              </proxy>
+            </proxies>
+          </foxyproxy>
